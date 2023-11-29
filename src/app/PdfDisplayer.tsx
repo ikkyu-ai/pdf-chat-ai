@@ -3,13 +3,13 @@
 import { Component } from "react";
 
 import {
-  AreaHighlight,
-  Highlight,
-  PdfHighlighter,
   PdfLoader,
-  Popup,
-  Tip,
+  PdfHighlighter,
+  AreaHighlight,
+  Popup
 } from "react-pdf-highlighter";
+import { Highlight } from "./components/Highlight";
+import Tip from "./components/Tip";
 
 import type { IHighlight, NewHighlight } from "react-pdf-highlighter";
 
@@ -218,8 +218,9 @@ class App extends Component<{}, State> {
                       }
                       onMouseOut={hideTip}
                       key={index}
-                      children={component}
-                    />
+                    >
+                      {component}
+                    </Popup>
                   );
                 }}
                 highlights={highlights}
