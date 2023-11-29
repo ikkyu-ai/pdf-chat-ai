@@ -1,5 +1,6 @@
 import { DarkModeToggle } from "@/components/dark-mode-toggle";
 import { Chat } from "@/components/chat";
+import PdfDisplayer from "./PdfDisplayer";
 
 export default function Home() {
   return (
@@ -9,7 +10,8 @@ export default function Home() {
         <DarkModeToggle />
       </div>
       <div className="flex flex-1 py-4">
-        <div className="w-full">
+        <div className="flex flex-row">
+          <PdfDisplayer />
           <Chat />
         </div>
       </div>
