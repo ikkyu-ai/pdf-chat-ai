@@ -1,21 +1,21 @@
 "use client";
 
-import React, { Component } from "react";
+import { Component } from "react";
 
 import {
-  PdfLoader,
-  PdfHighlighter,
-  Tip,
-  Highlight,
-  Popup,
   AreaHighlight,
+  Highlight,
+  PdfHighlighter,
+  PdfLoader,
+  Popup,
+  Tip,
 } from "react-pdf-highlighter";
 
 import type { IHighlight, NewHighlight } from "react-pdf-highlighter";
 
-import { testHighlights as _testHighlights } from "./test-highlights";
-import { Spinner } from "./Spinner";
 import { Sidebar } from "./Sidebar";
+import { Spinner } from "./Spinner";
+import { testHighlights as _testHighlights } from "./test-highlights";
 
 import "./style/App.css";
 
@@ -46,10 +46,9 @@ const HighlightPopup = ({
     </div>
   ) : null;
 
-
-  // https://arxiv.org/pdf/1708.08021.pdf
-  const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
-  // const PRIMARY_PDF_URL = "file:///Users/bytedance/pdf.js/web/compressed.tracemonkey-pldi-09.pdf";
+// https://arxiv.org/pdf/1708.08021.pdf
+const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
+// const PRIMARY_PDF_URL = "file:///Users/bytedance/pdf.js/web/compressed.tracemonkey-pldi-09.pdf";
 const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
 
 const searchParams = new URLSearchParams(document.location.search);
@@ -70,13 +69,10 @@ class App extends Component<{}, State> {
     });
   };
 
-  toggleDocument = () => {
-    const newUrl =
-      this.state.url === PRIMARY_PDF_URL ? SECONDARY_PDF_URL : PRIMARY_PDF_URL;
-
+  openDocument = (url: string) => {
     this.setState({
-      url: newUrl,
-      highlights: testHighlights[newUrl] ? [...testHighlights[newUrl]] : [],
+      url: url,
+      highlights: testHighlights[url] ? [...testHighlights[url]] : [],
     });
   };
 
@@ -145,7 +141,7 @@ class App extends Component<{}, State> {
         <Sidebar
           highlights={highlights}
           resetHighlights={this.resetHighlights}
-          toggleDocument={this.toggleDocument}
+          onDocumentOpened={this.openDocument}
         />
         <div
           style={{

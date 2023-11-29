@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { IHighlight } from "react-pdf-highlighter";
 
 interface Props {
   highlights: Array<IHighlight>;
   resetHighlights: () => void;
-  toggleDocument: () => void;
+  onDocumentOpened: (url: string) => void;
 }
 
 const updateHash = (highlight: IHighlight) => {
@@ -15,29 +15,36 @@ declare const APP_VERSION: string;
 
 export function Sidebar({
   highlights,
-  toggleDocument,
+  onDocumentOpened,
   resetHighlights,
-}: Props) {
+}: Props): React.ReactElement {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedFile) {
+      return;
+    }
+    const fileUrl = URL.createObjectURL(selectedFile);
+    console.log(fileUrl);
+    onDocumentOpened(fileUrl);
+  }, [selectedFile]);
+
   return (
     <div className="sidebar" style={{ width: "25vw" }}>
-      <div className="description" style={{ padding: "1rem" }}>
-        <h2 style={{ marginBottom: "1rem" }}>
-          react-pdf-highlighter
-        </h2>
-
-        <p style={{ fontSize: "0.7rem" }}>
-          <a href="https://github.com/agentcooper/react-pdf-highlighter">
-            Open in GitHub
-          </a>
-        </p>
-
-        <p>
-          <small>
-            To create area highlight hold ⌥ Option key (Alt), then click and
-            drag.
-          </small>
-        </p>
+      <div style={{ padding: "1rem" }}>
+        <input type="file" onChange={handleFileSelection} />
       </div>
+      {highlights.length > 0 ? (
+        <div style={{ padding: "1rem" }}>
+          <button onClick={resetHighlights}>Reset highlights</button>
+        </div>
+      ) : null}
 
       <ul className="sidebar__highlights">
         {highlights.map((highlight, index) => (
@@ -70,14 +77,6 @@ export function Sidebar({
           </li>
         ))}
       </ul>
-      <div style={{ padding: "1rem" }}>
-        <button onClick={toggleDocument}>Toggle PDF document</button>
-      </div>
-      {highlights.length > 0 ? (
-        <div style={{ padding: "1rem" }}>
-          <button onClick={resetHighlights}>Reset highlights</button>
-        </div>
-      ) : null}
     </div>
   );
 }
