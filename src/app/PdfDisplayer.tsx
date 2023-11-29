@@ -5,11 +5,11 @@ import React, { Component } from "react";
 import {
   PdfLoader,
   PdfHighlighter,
-  Tip,
-  Highlight,
   Popup,
   AreaHighlight,
 } from "react-pdf-highlighter";
+import { Highlight } from "./components/Highlight";
+import Tip from "./components/Tip";
 
 import type { IHighlight, NewHighlight } from "react-pdf-highlighter";
 
