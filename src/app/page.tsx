@@ -170,7 +170,7 @@ export default function Home() {
             isAIBusy={isAIBusy}
             setIsAIBusy={setIsAIBusy}
           />
-          {showChat ? <Chat /> : null}
+          <Chat />
         </PdfContext.Provider>
       </main>
     </>

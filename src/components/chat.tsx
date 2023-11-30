@@ -44,7 +44,6 @@ const aiModeToActionText = {
   explain: "Thinking of an explanation...",
 };
 
-
 export const Chat = () => {
   const { Paragraph } = Typography;
   const {
@@ -142,9 +141,8 @@ export const Chat = () => {
   useEffect(() => {
     if (showChat) {
       setTimeout(() => {
-        (document.querySelector('#chat-box') as HTMLElement).focus();
+        (document.querySelector("#chat-box") as HTMLElement).focus();
       }, 500);
-
     }
   }, [showChat]);
 
@@ -176,7 +174,7 @@ export const Chat = () => {
   // send message to API /api/chat endpoint
   const sendQuestion = async (
     question: string,
-    aiMode: "translate" | "chat" | 'summarize' | 'explain' = "chat"
+    aiMode: "translate" | "chat" | "summarize" | "explain" = "chat"
   ) => {
     const endpoint = aiModeToEndpoint[aiMode];
     const actionText = aiModeToActionText[aiMode];
@@ -194,8 +192,11 @@ export const Chat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          question:
+            aiMode === "summarize"
+              ? `Write a short summary of the following text only: "${question}"`
+              : question,
           phrase: selectedHighlight?.content.text,
-          question: aiMode === "summarize" ? `Write a short summary of the following text only: "${question}"` : question,
           chatHistory,
           indexKey,
           ...(aiMode === "translate" && { language: "Chinese" }),
@@ -244,13 +245,19 @@ export const Chat = () => {
 
   useEffect(() => {
     if (aiMode === "translate" && selectedText !== "") {
-      sendQuestion(selectedText, "translate");
+      setTimeout(() => {
+        sendQuestion(selectedText, "translate");
+      }, 500);
     }
     if (aiMode === "summarize" && selectedText !== "") {
-      sendQuestion(selectedText, "summarize");
+      setTimeout(() => {
+        sendQuestion(selectedText, "summarize");
+      }, 500);
     }
     if (aiMode === "explain" && selectedText !== "") {
-      sendQuestion(selectedText, "explain");
+      setTimeout(() => {
+        sendQuestion(selectedText, "explain");
+      }, 500);
     }
   }, [aiMode, selectedText]);
 
