@@ -63,8 +63,8 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           theme="borderless"
           type="tertiary"
           size="small"
+          style={{ color: 'black', padding: '4px 8px' }}
           icon={<IconAlignCenterVertical />}
-          className="mr-1"
           onClick={() => onClickAction('summarize')}
         >
           Summarize
@@ -74,7 +74,7 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           type="tertiary"
           size="small"
           icon={<IconQuote />}
-          className="mr-1"
+          style={{ color: 'black', padding: '4px 8px' }}
           onClick={() => onClickAction('explain')}
         >
           Explain
@@ -84,7 +84,7 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           type="tertiary"
           size="small"
           icon={<IconLanguage />}
-          className="mr-1"
+          style={{ color: 'black', padding: '4px 8px' }}
           onClick={() => onClickAction('translate')}
         >
           Translate
@@ -94,6 +94,7 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           type="tertiary"
           size="small"
           icon={<IconEdit />}
+          style={{ color: 'black', padding: '4px 8px' }}
           onClick={() => onClickAction('chat')}
         >
           Ask AI

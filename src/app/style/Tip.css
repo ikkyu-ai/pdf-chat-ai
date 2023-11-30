@@ -1,9 +1,10 @@
 .Tip__compact {
   cursor: pointer;
   background-color: white;
+  color: white;
   /* border-color: rgba(var(--semi-grey-6), 1); */
   box-shadow: 0 0 1px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .3);
-  border-radius: 40px;
+  border-radius: 4px;
   padding: 5px 10px;
 }
 

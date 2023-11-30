@@ -60,6 +60,7 @@ export const Chat = () => {
     isAIBusy,
     setIsAIBusy,
     showChat,
+    setSelectedHighlight,
   } = useContext(PdfContext);
   const endpoint = "/api/chat";
   const [input, setInput] = useState("");
@@ -73,19 +74,26 @@ export const Chat = () => {
 
   console.log("chatHistory: ", chatHistory);
 
+
+  const handleHashChange = () => {
+    const hash = window.location.hash;
+    const id = hash.split("-")[1];
+    setCurrHighlightId(id);
+    if (setSelectedHighlight && highlights.findIndex(h => h.id === id) >= 0) {
+      setSelectedHighlight(highlights.find(h => h.id === id));
+      console.log('selectedHighlight::highlights.find(h => h.id === id): ', highlights.find(h => h.id === id));
+    }
+  };
+
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      const id = hash.split("-")[1];
-      setCurrHighlightId(id);
-    };
+    // Add the event listener when the component mounts
+    window.addEventListener('hashchange', () => handleHashChange());
 
-    handleHashChange();
-    window.addEventListener("hashchange", handleHashChange);
-
+    // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener('hashchange', () => handleHashChange());
     };
+    
   }, [fileName]);
 
   useEffect(() => {
@@ -279,7 +287,7 @@ export const Chat = () => {
         saveCurrChat();
       }, 500);
     }
-  }, [chatHistory, isLoading]);
+  }, [isLoading]);
 
   const saveCurrChat = () => {
     const highlightsCopy = [...highlights];
@@ -353,7 +361,7 @@ export const Chat = () => {
   if (messages.length > 2) {
     placeholder = "Type to continue your conversation";
   }
-  console.log("messages: ", messages);
+  console.log('selectedHighlight: ', selectedHighlight);
 
   return (
     <div
@@ -365,7 +373,7 @@ export const Chat = () => {
         maxHeight: "100%",
       }}
     >
-      {selectedHighlight?.content?.text ? (
+      {highlights.find(h => h.id === currHighlightId)?.content?.text ? (
         <>
           <div className="text-black text-lg font-bold">Ask about...</div>
           <Paragraph
@@ -378,7 +386,7 @@ export const Chat = () => {
             }}
             style={{ width: "100%", paddingBottom: 8 }}
           >
-            {`"${selectedHighlight?.content?.text}":`}
+            {`"${highlights.find(h => h.id === currHighlightId)?.content?.text}":`}
           </Paragraph>
         </>
       ) : null}

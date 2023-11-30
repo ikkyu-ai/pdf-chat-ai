@@ -77,18 +77,18 @@ export default function Home() {
   const [selectedHighlight, setSelectedHighlight] = useState<IHighlight>();
   const [isAIBusy, setIsAIBusy] = useState<boolean>(false);
   const [storage, setStorage] = useState<FileStorage[]>([]);
-  const [needRefreshHighlights, setNeedRefreshHighlights] = useState(false);
+  const [needRefreshHighlights, setNeedRefreshHighlights] = useState(true);
 
   const loadHighlights = () => {
-    const storage = JSON.parse(
+    const _storage = JSON.parse(
       localStorage.getItem("chatStorage") || "[]"
     ) as FileStorage[];
-    setStorage(storage);
-    const highlights =
-      storage
+    setStorage(_storage);
+    const _highlights =
+      _storage
         .find((i) => i.fileName === fileName)
         ?.histories.map((h) => h.highlight) || [];
-    setHighlights(highlights);
+    setHighlights(_highlights);
   };
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export default function Home() {
             setFileName,
             indexKey,
             setIndexKey,
-            highlights: highlights,
+            highlights,
             setHighlights,
             addHighlight,
             selectedHighlight,
