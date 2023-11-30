@@ -2,7 +2,7 @@
 
 import { DarkModeToggle } from "@/components/dark-mode-toggle";
 import { Chat, FileStorage } from "@/components/chat";
-import PdfDisplayer from "./PdfDisplayer";
+import PdfDisplayer, { resetHash } from "./PdfDisplayer";
 import { createContext, useEffect, useRef, useState } from "react";
 import { Button, Layout } from "@douyinfe/semi-ui";
 import { useHover } from "ahooks";
@@ -32,6 +32,8 @@ export type PdfContextProps = {
   isAIBusy: boolean,
   setIsAIBusy?: React.Dispatch<React.SetStateAction<boolean>>;
   storage: FileStorage[];
+  needRefreshHighlights: boolean;
+  setNeedRefreshHighlights?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const PdfContext = createContext<PdfContextProps>({
@@ -55,6 +57,8 @@ export const PdfContext = createContext<PdfContextProps>({
   isAIBusy: false,
   setIsAIBusy: undefined,
   storage: [],
+  needRefreshHighlights: false,
+  setNeedRefreshHighlights: undefined,
 });
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -72,8 +76,9 @@ export default function Home() {
   const [selectedHighlight, setSelectedHighlight] = useState<IHighlight>();
   const [isAIBusy, setIsAIBusy] = useState<boolean>(false);
   const [storage, setStorage] = useState<FileStorage[]>([]);
+  const [needRefreshHighlights, setNeedRefreshHighlights] = useState(false);
 
-  useEffect(() => {
+  const loadHighlights = () => {
     const storage = JSON.parse(
       localStorage.getItem("chatStorage") || "[]"
     ) as FileStorage[];
@@ -83,18 +88,20 @@ export default function Home() {
         .find((i) => i.fileName === fileName)
         ?.histories.map((h) => h.highlight) || [];
     setHighlights(highlights);
+  };
+
+  useEffect(() => {
+    resetHash();
+    loadHighlights();
   }, [fileName]);
 
   useEffect(() => {
-    const allHighlightIds = highlights.map((h) => h.id);
-    const storageIndex = storage.findIndex((s) => s.fileName === fileName);
-    if (storageIndex >= 0) {
-      storage[storageIndex].histories = storage[storageIndex].histories.filter(
-        (h) => allHighlightIds.includes(h.highlightId)
-      );
-      localStorage.setItem("chatStorage", JSON.stringify(storage));
+    if (needRefreshHighlights) {
+      loadHighlights();
+      setNeedRefreshHighlights(false);
     }
-  }, [highlights]);
+  }, [needRefreshHighlights]);
+
 
   const addHighlight = (highlight: NewHighlight) => {
     console.log("Saving highlight", highlight);
@@ -159,6 +166,8 @@ export default function Home() {
             isAIBusy,
             setIsAIBusy,
             storage,
+            needRefreshHighlights,
+            setNeedRefreshHighlights,
           }}
         >
           <PdfDisplayer
@@ -169,6 +178,8 @@ export default function Home() {
             setSummary={setSummary}
             isAIBusy={isAIBusy}
             setIsAIBusy={setIsAIBusy}
+            storage={storage}
+            setNeedRefreshHighlights={setNeedRefreshHighlights}
           />
           <Chat />
         </PdfContext.Provider>

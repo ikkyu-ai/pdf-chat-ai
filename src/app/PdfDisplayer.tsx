@@ -2,11 +2,7 @@
 
 import React, { Component } from "react";
 
-import {
-  PdfLoader,
-  AreaHighlight,
-  Popup
-} from "react-pdf-highlighter";
+import { PdfLoader, AreaHighlight, Popup } from "react-pdf-highlighter";
 import { Highlight } from "./components/Highlight";
 import Tip from "./components/Tip";
 
@@ -20,6 +16,7 @@ import "./style/App.css";
 import { PdfHighlighter } from "./components/PdfHighlighter";
 import { PdfContext } from "./page";
 import { IHighlight, NewHighlight } from "./types/types";
+import { FileStorage } from "@/components/chat";
 
 const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
 
@@ -56,33 +53,56 @@ const searchParams = new URLSearchParams(document.location.search);
 
 const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
 
-class PdfDisplayer extends Component<{
-  highlights: IHighlight[],
-  setHighlights: React.Dispatch<React.SetStateAction<IHighlight[]>>,
-  setSelectedHighlight: React.Dispatch<React.SetStateAction<IHighlight | undefined>>,
-  addHighlight?: ((highlight: NewHighlight) => void) | undefined,
-  setSummary?: React.Dispatch<React.SetStateAction<string>>;
-  isAIBusy: boolean,
-  setIsAIBusy?: React.Dispatch<React.SetStateAction<boolean>>;
-}, State> {
+class PdfDisplayer extends Component<
+  {
+    highlights: IHighlight[];
+    setHighlights: React.Dispatch<React.SetStateAction<IHighlight[]>>;
+    setSelectedHighlight: React.Dispatch<
+      React.SetStateAction<IHighlight | undefined>
+    >;
+    addHighlight?: ((highlight: NewHighlight) => void) | undefined;
+    setSummary?: React.Dispatch<React.SetStateAction<string>>;
+    isAIBusy: boolean;
+    setIsAIBusy?: React.Dispatch<React.SetStateAction<boolean>>;
+    storage: FileStorage[];
+    setNeedRefreshHighlights: React.Dispatch<React.SetStateAction<boolean>>;
+  },
+  State
+> {
   state = {
     url: initialUrl,
   };
 
   deleteHighlight = (id: string) => {
-    const highlightsCopy = [...this.props.highlights];
-    this.props.setHighlights(highlightsCopy.filter(i => i.id !== id));
-  }
+    const fileName = localStorage.getItem("fileName") || "";
+    const fileIndex = this.props.storage.findIndex(
+      (s) => s.fileName === fileName
+    );
+    if (fileIndex >= 0) {
+      const remaining = this.props.storage[fileIndex].histories.filter(
+        (h) => h.highlightId !== id
+      );
+      const newFileStorage: FileStorage = {
+        fileName,
+        histories: remaining,
+      };
+      const storageCopy = [...this.props.storage];
+      storageCopy[fileIndex] = newFileStorage;
+      localStorage.setItem("chatStorage", JSON.stringify(storageCopy));
+      this.props.setNeedRefreshHighlights(true);
+      resetHash();
+    }
+  };
 
   handleOpenFile = async (file: File) => {
     const url = URL.createObjectURL(file);
     this.setState({
       url: url,
     });
-    const key = file.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    const key = file.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('key', key);
+    formData.append("file", file);
+    formData.append("key", key);
     try {
       this.props.setIsAIBusy?.(true);
       const response = await fetch("/api/upload", {
@@ -144,39 +164,42 @@ class PdfDisplayer extends Component<{
   updateHighlight(highlightId: string, position: Object, content: Object) {
     console.log("Updating highlight", highlightId, position, content);
 
-    this.props.setHighlights(this.props.highlights.map((h) => {
-      const {
-        id,
-        position: originalPosition,
-        content: originalContent,
-        ...rest
-      } = h;
-      return id === highlightId
-        ? {
-            id,
-            position: { ...originalPosition, ...position },
-            content: { ...originalContent, ...content },
-            ...rest,
-          }
-        : h;
-    }));
+    this.props.setHighlights(
+      this.props.highlights.map((h) => {
+        const {
+          id,
+          position: originalPosition,
+          content: originalContent,
+          ...rest
+        } = h;
+        return id === highlightId
+          ? {
+              id,
+              position: { ...originalPosition, ...position },
+              content: { ...originalContent, ...content },
+              ...rest,
+            }
+          : h;
+      })
+    );
   }
 
   render() {
     const { url } = this.state;
-    const { highlights, setHighlights, setSelectedHighlight, setSummary } = this.props;
+    const { highlights, setHighlights, setSelectedHighlight, setSummary } =
+      this.props;
 
     return (
       <div className="App" style={{ display: "flex", height: "100%" }}>
         <Sidebar
-          highlights={highlights.filter(h => h.isSaved) || []}
+          highlights={highlights.filter((h) => h.isSaved) || []}
           deleteHighlight={this.deleteHighlight}
           onFileOpen={this.handleOpenFile}
         />
         <div
           style={{
             height: "100%",
-            width: '60vw',
+            width: "60vw",
             position: "relative",
           }}
         >
