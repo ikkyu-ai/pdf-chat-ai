@@ -19,9 +19,8 @@ type callQueryExplainArgs = {
   transformStream: TransformStream;
 };
 
-const QA_TEMPLATE = (language: string, question: string) => `Translate "${question}" into ${language}. 
-  The first part of the response is short and concise. The second part is a detailed explaination.
-  Response only with target language and in markdown format.`;
+const QA_TEMPLATE = (language: string, question: string) => `You need to response in ${language} with markdown format. 
+  Translate and then explain "${question}"`;
 const EXPLAIN_TEMPLATE = (question: string) => `Explain "${question}". 
   The first part of the response is short and concise. The second part is a detailed explaination.
   Response in markdown format.`;
