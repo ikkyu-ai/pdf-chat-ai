@@ -32,9 +32,9 @@ export interface ChatStorage {
 
 const aiModeToEndpoint = {
   chat: "/api/chat",
-  summarize: "/api/chat",
+  summarize: "/api/summarize",
   translate: "/api/translate",
-  explain: "/api/translate",
+  explain: "/api/explain",
 };
 
 const aiModeToActionText = {
@@ -192,15 +192,11 @@ export const Chat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          question:
-            aiMode === "summarize"
-              ? `Write a short summary of the following text only: "${question}"`
-              : question,
+          question,
           phrase: selectedHighlight?.content.text,
           chatHistory,
           indexKey,
           ...(aiMode === "translate" && { language: "Chinese" }),
-          ...(aiMode === "explain" && { language: "English" }),
         }),
       });
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callDirectQueryExplain } from "@/lib/direct-query";
+import { callDirectQuerySummarize } from "@/lib/direct-query";
 
 export async function POST(req: NextRequest) {
   const { question } = await req.json();
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const transformStream = new TransformStream();
-    const readableStream = callDirectQueryExplain({
+    const readableStream = callDirectQuerySummarize({
       question,
       transformStream,
     });
