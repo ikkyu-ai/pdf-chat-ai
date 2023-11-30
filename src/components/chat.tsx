@@ -180,11 +180,18 @@ export const Chat = () => {
     const actionText = aiModeToActionText[aiMode];
 
     setIsLoading(true);
-    updateMessages({
-      role: "assistant",
-      content: actionText,
-    });
-
+    if (aiMode === 'chat') {
+      updateMessages({
+        role: "user",
+        content: question,
+      });
+    } else {
+      updateMessages({
+        role: "assistant",
+        content: actionText,
+      });
+    }
+   
     try {
       const response = await fetch(endpoint, {
         method: "POST",
