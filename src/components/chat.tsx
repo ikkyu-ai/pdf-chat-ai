@@ -61,6 +61,8 @@ export const Chat = () => {
     setIsAIBusy,
     showChat,
     setSelectedHighlight,
+    setNeedRefreshHighlights,
+    needRefreshHighlights,
   } = useContext(PdfContext);
   const endpoint = "/api/chat";
   const [input, setInput] = useState("");
@@ -83,6 +85,7 @@ export const Chat = () => {
       setSelectedHighlight(highlights.find(h => h.id === id));
       console.log('selectedHighlight::highlights.find(h => h.id === id): ', highlights.find(h => h.id === id));
     }
+    setNeedRefreshHighlights?.(true);
   };
 
   useEffect(() => {
@@ -98,7 +101,7 @@ export const Chat = () => {
 
   useEffect(() => {
     const chatHistory =
-      storage
+      (JSON.parse(localStorage.getItem('chatStorage') || '[]') as FileStorage[])
         .find((s) => s.fileName === localStorage.getItem("fileName") || "")
         ?.histories.find((h) => h.highlightId === currHighlightId)
         ?.chatHistory || [];
