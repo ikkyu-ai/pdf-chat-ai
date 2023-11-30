@@ -15,8 +15,10 @@ export type PdfContextProps = {
   setShowChat?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedText: string;
   setSelectedText?: React.Dispatch<React.SetStateAction<string>>;
-  aiMode: 'chat' | 'translate' | 'summarize' | 'explain';
-  setAiMode?: React.Dispatch<React.SetStateAction<'chat' | 'translate' | 'summarize' | 'explain'>>;
+  aiMode: "chat" | "translate" | "summarize" | "explain";
+  setAiMode?: React.Dispatch<
+    React.SetStateAction<"chat" | "translate" | "summarize" | "explain">
+  >;
   fileName: string;
   setFileName?: React.Dispatch<React.SetStateAction<string>>;
   indexKey: string;
@@ -30,7 +32,7 @@ export type PdfContextProps = {
   >;
   summary: string;
   setSummary?: React.Dispatch<React.SetStateAction<string>>;
-  isAIBusy: boolean,
+  isAIBusy: boolean;
   setIsAIBusy?: React.Dispatch<React.SetStateAction<boolean>>;
   storage: FileStorage[];
   needRefreshHighlights: boolean;
@@ -64,10 +66,23 @@ export const PdfContext = createContext<PdfContextProps>({
 
 const getNextId = () => String(Math.random()).slice(2);
 
+export const getHighlights = () => {
+  const _storage = JSON.parse(
+    localStorage.getItem("chatStorage") || "[]"
+  ) as FileStorage[];
+  const _highlights =
+    _storage
+      .find((i) => i.fileName === localStorage.getItem("fileName"))
+      ?.histories.map((h) => h.highlight) || [];
+  return _highlights;
+};
+
 export default function Home() {
   const [showChat, setShowChat] = useState(false);
   const [selectedText, setSelectedText] = useState("");
-  const [aiMode, setAiMode] = useState<'chat' | 'translate' | 'summarize' | 'explain'>("chat");
+  const [aiMode, setAiMode] = useState<
+    "chat" | "translate" | "summarize" | "explain"
+  >("chat");
   const [fileName, setFileName] = useState<string>("");
   const [indexKey, setIndexKey] = useState<string>("");
   const [highlights, setHighlights] = useState<IHighlight[]>([]);
@@ -103,13 +118,40 @@ export default function Home() {
     }
   }, [needRefreshHighlights]);
 
-
   const addHighlight = (highlight: NewHighlight) => {
     console.log("Saving highlight", highlight);
-    const newHighlight = { ...highlight, id: getNextId(), isSaved: false };
+    const newHighlight = { ...highlight, id: getNextId(), isSaved: true };
     updateHash(newHighlight);
     setSelectedHighlight({ ...newHighlight });
+    const lS = JSON.parse(
+      localStorage.getItem("chatStorage") || "[]"
+    ) as FileStorage[];
+    const fileIndex = lS.findIndex((i) => i.fileName === fileName);
+    if (fileIndex >= 0) {
+      const historiesCopy = [...lS[fileIndex].histories];
+      historiesCopy.push({
+        chatHistory: [],
+        highlight: newHighlight,
+        highlightId: newHighlight.id,
+      });
+      const lSCopy = [...lS];
+      lSCopy[fileIndex].histories = historiesCopy;
+      localStorage.setItem("chatStorage", JSON.stringify(lSCopy));
+    } else {
+      lS.push({
+        fileName,
+        histories: [
+          {
+            chatHistory: [],
+            highlight: newHighlight,
+            highlightId: newHighlight.id,
+          },
+        ],
+      });
+      localStorage.setItem("chatStorage", JSON.stringify(lS));
+    }
     setHighlights([newHighlight, ...highlights]);
+    setNeedRefreshHighlights(true);
   };
 
   return (
@@ -182,8 +224,9 @@ export default function Home() {
             setIsAIBusy={setIsAIBusy}
             storage={storage}
             setNeedRefreshHighlights={setNeedRefreshHighlights}
+            needRefreshHighlights={needRefreshHighlights}
           />
-          <Chat />
+          {fileName ? <Chat /> : null}
         </PdfContext.Provider>
       </main>
     </>

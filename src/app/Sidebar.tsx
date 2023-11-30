@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import type { IHighlight } from "react-pdf-highlighter";
 import { PdfContext } from "./page";
 import { resetHash } from "./PdfDisplayer";
+import { FileStorage } from "@/components/chat";
 
 interface Props {
-  highlights: Array<IHighlight>;
+  // highlights: Array<IHighlight>;
   deleteHighlight: (id: string) => void;
   onFileOpen?: (file: File) => void;
 }
@@ -16,12 +17,21 @@ export const updateHash = (highlight: IHighlight) => {
 declare const APP_VERSION: string;
 
 export function Sidebar({
-  highlights,
   deleteHighlight,
-  onFileOpen
+  onFileOpen,
 }: Props): React.ReactElement {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { setFileName, setIndexKey } = useContext(PdfContext);
+  const {
+    setFileName,
+    setIndexKey,
+    setNeedRefreshHighlights,
+    highlights,
+    needRefreshHighlights,
+    fileName,
+  } = useContext(PdfContext);
+
+  const [_hl, setHl] = useState<IHighlight[]>([]);
+  const [retrieveTrigger, setRetrieveTrigger] = useState(1);
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -29,20 +39,33 @@ export function Sidebar({
     }
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (!selectedFile) {
       return;
     }
     console.log(selectedFile);
     setFileName?.(selectedFile.name);
-    const key = selectedFile.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    setIndexKey?.(key)
+    const key = selectedFile.name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+    setIndexKey?.(key);
     onFileOpen?.(selectedFile);
-    localStorage.setItem('fileName', selectedFile.name);
+    localStorage.setItem("fileName", selectedFile.name);
   }, [selectedFile]);
 
+  useEffect(() => {
+    const temp =
+      (JSON.parse(localStorage.getItem("chatStorage") || "[]") as FileStorage[])
+        .find((i) => i.fileName === localStorage.getItem("fileName"))
+        ?.histories.map((h) => h.highlight) || [];
+    setHl(temp);
+  }, [retrieveTrigger, needRefreshHighlights]);
+
   return (
-    <div className="sidebar" style={{ width: "20vw" }}>
+    <div
+      className="sidebar"
+      style={
+        fileName ? { width: "20vw" } : { visibility: "hidden", width: "20vw" }
+      }
+    >
       <div>
         <input
           className="hidden"
@@ -57,7 +80,7 @@ export function Sidebar({
           <button onClick={resetHighlights}>Reset highlights</button>
         </div>
       ) : null} */}
-      {highlights.length > 0 ? (
+      {_hl.length > 0 ? (
         <div
           className="p-4 font-bold text-xl sticky top-0 z-50 w-full"
           style={{ backgroundColor: "rgba(var(--semi-grey-0), 1)" }}
@@ -67,7 +90,7 @@ export function Sidebar({
       ) : null}
 
       <div className="sidebar__highlights">
-        {highlights.map((highlight, index) => (
+        {_hl.map((highlight, index) => (
           <div
             key={index}
             className="sidebar__highlight"
@@ -97,7 +120,11 @@ export function Sidebar({
                 style={{ color: "rgba(var(--semi-grey-4), 1)" }}
                 onClick={() => {
                   deleteHighlight(highlight.id);
-                  resetHash();
+                  setNeedRefreshHighlights?.(true);
+                  setRetrieveTrigger(retrieveTrigger + 1);
+                  setTimeout(() => {
+                    resetHash();
+                  }, 100);
                 }}
               >
                 Delete

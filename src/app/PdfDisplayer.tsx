@@ -14,7 +14,7 @@ import { testHighlights as _testHighlights } from "./test-highlights";
 
 import "./style/App.css";
 import { PdfHighlighter } from "./components/PdfHighlighter";
-import { PdfContext } from "./page";
+import { PdfContext, getHighlights } from "./page";
 import { IHighlight, NewHighlight } from "./types/types";
 import { FileStorage } from "@/components/chat";
 
@@ -65,6 +65,7 @@ class PdfDisplayer extends Component<
     isAIBusy: boolean;
     setIsAIBusy?: React.Dispatch<React.SetStateAction<boolean>>;
     storage: FileStorage[];
+    needRefreshHighlights: boolean;
     setNeedRefreshHighlights: React.Dispatch<React.SetStateAction<boolean>>;
   },
   State
@@ -74,21 +75,21 @@ class PdfDisplayer extends Component<
   };
 
   deleteHighlight = (id: string) => {
+    const _storage = JSON.parse(localStorage.getItem("chatStorage") || "[]");
     const fileName = localStorage.getItem("fileName") || "";
-    const fileIndex = this.props.storage.findIndex(
-      (s) => s.fileName === fileName
-    );
+    const fileIndex = _storage.findIndex((s) => s.fileName === fileName);
     if (fileIndex >= 0) {
-      const remaining = this.props.storage[fileIndex].histories.filter(
+      const remaining = _storage[fileIndex].histories.filter(
         (h) => h.highlightId !== id
       );
       const newFileStorage: FileStorage = {
         fileName,
         histories: remaining,
       };
-      const storageCopy = [...this.props.storage];
+      const storageCopy = [..._storage];
       storageCopy[fileIndex] = newFileStorage;
       localStorage.setItem("chatStorage", JSON.stringify(storageCopy));
+      this.props.setHighlights(getHighlights());
       this.props.setNeedRefreshHighlights(true);
       resetHash();
     }
@@ -186,13 +187,17 @@ class PdfDisplayer extends Component<
 
   render() {
     const { url } = this.state;
-    const { highlights, setHighlights, setSelectedHighlight, setSummary } =
-      this.props;
+    const {
+      highlights,
+      setHighlights,
+      setSelectedHighlight,
+      setSummary,
+      needRefreshHighlights,
+    } = this.props;
 
     return (
       <div className="App" style={{ display: "flex", height: "100%" }}>
         <Sidebar
-          highlights={highlights.filter((h) => h.isSaved) || []}
           deleteHighlight={this.deleteHighlight}
           onFileOpen={this.handleOpenFile}
         />
@@ -277,7 +282,7 @@ class PdfDisplayer extends Component<
                     </Popup>
                   );
                 }}
-                highlights={highlights}
+                highlights={[...highlights]}
               />
             )}
           </PdfLoader>

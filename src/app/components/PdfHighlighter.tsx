@@ -164,9 +164,9 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       this.init();
       return;
     }
-    if (prevProps.highlights !== this.props.highlights) {
-      this.renderHighlightLayers();
-    }
+    // if (prevProps.highlights !== this.props.highlights) {
+    this.renderHighlightLayers();
+    // }
   }
 
   init() {

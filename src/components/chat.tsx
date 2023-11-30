@@ -76,32 +76,33 @@ export const Chat = () => {
 
   console.log("chatHistory: ", chatHistory);
 
-
   const handleHashChange = () => {
     const hash = window.location.hash;
     const id = hash.split("-")[1];
     setCurrHighlightId(id);
-    if (setSelectedHighlight && highlights.findIndex(h => h.id === id) >= 0) {
-      setSelectedHighlight(highlights.find(h => h.id === id));
-      console.log('selectedHighlight::highlights.find(h => h.id === id): ', highlights.find(h => h.id === id));
+    if (setSelectedHighlight && highlights.findIndex((h) => h.id === id) >= 0) {
+      setSelectedHighlight(highlights.find((h) => h.id === id));
+      console.log(
+        "selectedHighlight::highlights.find(h => h.id === id): ",
+        highlights.find((h) => h.id === id)
+      );
     }
     setNeedRefreshHighlights?.(true);
   };
 
   useEffect(() => {
     // Add the event listener when the component mounts
-    window.addEventListener('hashchange', () => handleHashChange());
+    window.addEventListener("hashchange", () => handleHashChange());
 
     // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener('hashchange', () => handleHashChange());
+      window.removeEventListener("hashchange", () => handleHashChange());
     };
-    
   }, [fileName]);
 
   useEffect(() => {
     const chatHistory =
-      (JSON.parse(localStorage.getItem('chatStorage') || '[]') as FileStorage[])
+      (JSON.parse(localStorage.getItem("chatStorage") || "[]") as FileStorage[])
         .find((s) => s.fileName === localStorage.getItem("fileName") || "")
         ?.histories.find((h) => h.highlightId === currHighlightId)
         ?.chatHistory || [];
@@ -191,7 +192,7 @@ export const Chat = () => {
     const actionText = aiModeToActionText[aiMode];
 
     setIsLoading(true);
-    if (aiMode === 'chat') {
+    if (aiMode === "chat") {
       updateMessages({
         role: "user",
         content: question,
@@ -202,7 +203,7 @@ export const Chat = () => {
         content: actionText,
       });
     }
-   
+
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -294,36 +295,30 @@ export const Chat = () => {
 
   const saveCurrChat = () => {
     const highlightsCopy = [...highlights];
-    const index = highlightsCopy.findIndex(
-      (h) => h.id === selectedHighlight?.id
-    );
-    console.log("selectedHighlight: ", selectedHighlight);
-    highlightsCopy[index] = {
-      ...highlightsCopy[index],
-      isSaved: true,
-    };
-    console.log("highlightsCopy: ", highlightsCopy);
+    const index = highlightsCopy.findIndex((h) => h.id === currHighlightId);
     setHighlights && setHighlights(highlightsCopy);
 
-    let storage: FileStorage[] = [];
+    let _storage: FileStorage[] = [];
     if (localStorage.getItem("chatStorage")) {
-      storage = JSON.parse(
+      _storage = JSON.parse(
         localStorage.getItem("chatStorage") || "[]"
       ) as FileStorage[];
     }
-    const currFileStorage: FileStorage = storage.find(
+    const currFileStorage: FileStorage = _storage.find(
       (i) => i.fileName === localStorage.getItem("fileName")
     ) || {
       fileName: localStorage.getItem("fileName") || "",
       histories: [],
     };
-    const historyItemIndex =
-      currFileStorage?.histories.findIndex(
-        (h) => h.highlightId === selectedHighlight?.id
-      ) || -1;
+    const historyItemIndex = currFileStorage?.histories.findIndex(
+      (h) => h.highlightId === currHighlightId
+    );
     const newHistoryItem: History = {
-      highlight: { ...selectedHighlight, isSaved: true } as IHighlight,
-      highlightId: selectedHighlight?.id || "",
+      highlight: {
+        ...highlightsCopy.find((i) => i.id === currHighlightId),
+        isSaved: true,
+      } as IHighlight,
+      highlightId: currHighlightId || "",
       chatHistory,
     };
     if (historyItemIndex >= 0 && currFileStorage?.histories) {
@@ -333,38 +328,38 @@ export const Chat = () => {
     }
     console.log("currFileStorage: ", currFileStorage);
     if (currFileStorage) {
-      const fileStorageIndex = storage.findIndex(
+      const fileStorageIndex = _storage.findIndex(
         (i) => i.fileName === localStorage.getItem("fileName")
       );
       if (fileStorageIndex >= 0) {
-        storage[
-          storage.findIndex(
+        _storage[
+          _storage.findIndex(
             (i) => i.fileName === localStorage.getItem("fileName")
           )
         ] = currFileStorage;
       } else {
-        storage.push(currFileStorage);
+        _storage.push(currFileStorage);
       }
-      console.log("storage: ", storage);
+      console.log("storage: ", _storage);
     }
-    localStorage.setItem("chatStorage", JSON.stringify(storage));
+    localStorage.setItem("chatStorage", JSON.stringify(_storage));
   };
 
-  useEffect(() => {
-    let storage: FileStorage[] = [];
-    if (localStorage.getItem("chatStorage")) {
-      storage = JSON.parse(
-        localStorage.getItem("chatStorage") || "[]"
-      ) as FileStorage[];
-    }
-  }, [highlights]);
+  // useEffect(() => {
+  //   let _storage: FileStorage[] = [];
+  //   if (localStorage.getItem("chatStorage")) {
+  //     _storage = JSON.parse(
+  //       localStorage.getItem("chatStorage") || "[]"
+  //     ) as FileStorage[];
+  //   }
+  // }, [highlights]);
 
   let placeholder = "Type a message to start ...";
 
   if (messages.length > 2) {
     placeholder = "Type to continue your conversation";
   }
-  console.log('selectedHighlight: ', selectedHighlight);
+  console.log("selectedHighlight: ", selectedHighlight);
 
   return (
     <div
@@ -376,9 +371,9 @@ export const Chat = () => {
         maxHeight: "100%",
       }}
     >
-      {highlights.find(h => h.id === currHighlightId)?.content?.text ? (
+      {highlights.find((h) => h.id === currHighlightId)?.content?.text ? (
         <>
-          <div className="text-black text-lg font-bold">Ask about...</div>
+          <div className="text-black text-lg font-bold mb-1">Ask about...</div>
           <Paragraph
             ellipsis={{
               rows: 3,
@@ -389,10 +384,35 @@ export const Chat = () => {
             }}
             style={{ width: "100%", paddingBottom: 8 }}
           >
-            {`"${highlights.find(h => h.id === currHighlightId)?.content?.text}":`}
+            {`"${
+              highlights.find((h) => h.id === currHighlightId)?.content?.text
+            }":`}
           </Paragraph>
         </>
-      ) : null}
+      ) : (
+        <>
+          <div className="text-black text-lg font-bold">
+            Select text from PDF,
+          </div>
+          <div className="flex text-black text-lg font-bold items-baseline">
+            <div>and chat with</div>
+            <div
+              className="font-bold"
+              style={{
+                background: "linear-gradient(to right bottom, red, blue)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                marginLeft: 6,
+                marginBottom: 8,
+                fontSize: 20,
+              }}
+            >
+              AI
+            </div>
+          </div>
+        </>
+      )}
       <div ref={containerRef}>
         {messages.map(({ content, role, sources }, index) => (
           <ChatLine

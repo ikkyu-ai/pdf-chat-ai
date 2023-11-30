@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Button, Popover } from "@douyinfe/semi-ui";
 import { IconAlignCenterVertical, IconCustomerSupport, IconEdit, IconLanguage, IconQuote } from "@douyinfe/semi-icons";
-import { PdfContext } from "@/app/page";
+import { PdfContext, getHighlights } from "@/app/page";
 
 import "../style/Tip.css";
 
@@ -24,7 +24,7 @@ interface TipProps {
 }
 
 const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
-  const { setShowChat, setSelectedText, setAiMode } = useContext(PdfContext);
+  const { setShowChat, setSelectedText, setAiMode, setHighlights } = useContext(PdfContext);
   const [state, setState] = useState({
     compact: true,
     text: "",
@@ -51,6 +51,7 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
       text: '',
       emoji: '',
     });
+    setHighlights?.(getHighlights());
     setState((prevState) => ({ ...prevState, compact: false }));
   };
 
@@ -93,11 +94,25 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           theme="borderless"
           type="tertiary"
           size="small"
-          icon={<IconEdit />}
           style={{ color: 'black', padding: '4px 8px' }}
           onClick={() => onClickAction('chat')}
         >
-          Ask AI
+          <div className="flex items-center">
+            <div
+                className="font-bold"
+                style={{
+                  background: "linear-gradient(to right bottom, red, blue)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  fontSize: 16,
+                  marginRight: 8,
+                }}
+              >
+                AI
+              </div>
+              Chat
+          </div>
         </Button>
       </div>
     </div>
