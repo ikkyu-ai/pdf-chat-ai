@@ -109,27 +109,27 @@ class PdfDisplayer extends Component<
         method: "POST",
         body: formData,
       });
-      const reader = response?.body?.getReader();
-      let streamingSummary = "";
-      let tokensEnded = false;
-      while (true) {
-        const { done, value } = (await reader?.read()) || {};
-        if (done) {
-          break;
-        }
-        const text = new TextDecoder().decode(value);
-        if (text.includes("tokens-ended") && !tokensEnded) {
-          tokensEnded = true;
-          let texts = text.split("tokens-ended");
-          if (texts.length > 1) {
-            streamingSummary = streamingSummary + texts[0];
-          }
-        } else {
-          streamingSummary = streamingSummary + text;
-        }
-      }
-      console.log("streaming summary", streamingSummary);
-      this.props.setSummary?.(streamingSummary);
+      // const reader = response?.body?.getReader();
+      // let streamingSummary = "";
+      // let tokensEnded = false;
+      // while (true) {
+      //   const { done, value } = (await reader?.read()) || {};
+      //   if (done) {
+      //     break;
+      //   }
+      //   const text = new TextDecoder().decode(value);
+      //   if (text.includes("tokens-ended") && !tokensEnded) {
+      //     tokensEnded = true;
+      //     let texts = text.split("tokens-ended");
+      //     if (texts.length > 1) {
+      //       streamingSummary = streamingSummary + texts[0];
+      //     }
+      //   } else {
+      //     streamingSummary = streamingSummary + text;
+      //   }
+      // }
+      // console.log("streaming summary", streamingSummary);
+      // this.props.setSummary?.(streamingSummary);
     } catch (err) {
       console.log(err);
     } finally {
