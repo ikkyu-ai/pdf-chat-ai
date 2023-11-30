@@ -31,9 +31,19 @@ export interface ChatStorage {
 }
 
 const aiModeToEndpoint = {
-  translate: "/api/translate",
   chat: "/api/chat",
+  summarize: "/api/chat",
+  translate: "/api/translate",
+  explain: "/api/translate",
 };
+
+const aiModeToActionText = {
+  chat: "Thinking...",
+  summarize: "Producing a summary...",
+  translate: "Coming up with a translation...",
+  explain: "Thinking of an explanation...",
+};
+
 
 export const Chat = () => {
   const { Paragraph } = Typography;
@@ -166,14 +176,15 @@ export const Chat = () => {
   // send message to API /api/chat endpoint
   const sendQuestion = async (
     question: string,
-    aiMode: "translate" | "chat" = "chat"
+    aiMode: "translate" | "chat" | 'summarize' | 'explain' = "chat"
   ) => {
     const endpoint = aiModeToEndpoint[aiMode];
+    const actionText = aiModeToActionText[aiMode];
 
     setIsLoading(true);
     updateMessages({
-      role: "user",
-      content: aiMode === "translate" ? `Translate ${question}` : question,
+      role: "assistant",
+      content: actionText,
     });
 
     try {
@@ -183,11 +194,12 @@ export const Chat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          question,
           phrase: selectedHighlight?.content.text,
+          question: aiMode === "summarize" ? `Write a short summary of the following text only: "${question}"` : question,
           chatHistory,
           indexKey,
           ...(aiMode === "translate" && { language: "Chinese" }),
+          ...(aiMode === "explain" && { language: "English" }),
         }),
       });
 
@@ -233,6 +245,12 @@ export const Chat = () => {
   useEffect(() => {
     if (aiMode === "translate" && selectedText !== "") {
       sendQuestion(selectedText, "translate");
+    }
+    if (aiMode === "summarize" && selectedText !== "") {
+      sendQuestion(selectedText, "summarize");
+    }
+    if (aiMode === "explain" && selectedText !== "") {
+      sendQuestion(selectedText, "explain");
     }
   }, [aiMode, selectedText]);
 

@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Button, Popover } from "@douyinfe/semi-ui";
-import { IconCustomerSupport, IconLanguage } from "@douyinfe/semi-icons";
+import { IconAlignCenterVertical, IconCustomerSupport, IconEdit, IconLanguage, IconQuote } from "@douyinfe/semi-icons";
 import { PdfContext } from "@/app/page";
 
 import "../style/Tip.css";
@@ -42,7 +42,7 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
 
   const { compact, text, emoji } = state;
 
-  const onClickAction = (aiMode: 'chat' | 'translate') => {
+  const onClickAction = (aiMode: 'chat' | 'translate' | 'summarize' | 'explain') => {
     setAiMode?.(aiMode);
     setShowChat?.(true);
     setSelectedText?.(window.getSelection()?.toString() || "");
@@ -58,7 +58,27 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
     <div className="Tip">
       <div
         className="Tip__compact"
-      >
+      >    
+        <Button
+          theme="borderless"
+          type="tertiary"
+          size="small"
+          icon={<IconAlignCenterVertical />}
+          className="mr-1"
+          onClick={() => onClickAction('summarize')}
+        >
+          Summarize
+        </Button>
+        <Button
+          theme="borderless"
+          type="tertiary"
+          size="small"
+          icon={<IconQuote />}
+          className="mr-1"
+          onClick={() => onClickAction('explain')}
+        >
+          Explain
+        </Button>
         <Button
           theme="borderless"
           type="tertiary"
@@ -66,14 +86,18 @@ const Tip = ({ onConfirm, onOpen, onUpdate }: TipProps) => {
           icon={<IconLanguage />}
           className="mr-1"
           onClick={() => onClickAction('translate')}
-        />
+        >
+          Translate
+        </Button>
         <Button
           theme="borderless"
           type="tertiary"
           size="small"
-          icon={<IconCustomerSupport />}
+          icon={<IconEdit />}
           onClick={() => onClickAction('chat')}
-        />
+        >
+          Ask AI
+        </Button>
       </div>
     </div>
   );

@@ -14,8 +14,8 @@ export type PdfContextProps = {
   setShowChat?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedText: string;
   setSelectedText?: React.Dispatch<React.SetStateAction<string>>;
-  aiMode: "chat" | "translate";
-  setAiMode?: React.Dispatch<React.SetStateAction<"chat" | "translate">>;
+  aiMode: 'chat' | 'translate' | 'summarize' | 'explain';
+  setAiMode?: React.Dispatch<React.SetStateAction<'chat' | 'translate' | 'summarize' | 'explain'>>;
   fileName: string;
   setFileName?: React.Dispatch<React.SetStateAction<string>>;
   indexKey: string;
@@ -62,7 +62,7 @@ const getNextId = () => String(Math.random()).slice(2);
 export default function Home() {
   const [showChat, setShowChat] = useState(false);
   const [selectedText, setSelectedText] = useState("");
-  const [aiMode, setAiMode] = useState<"chat" | "translate">("chat");
+  const [aiMode, setAiMode] = useState<'chat' | 'translate' | 'summarize' | 'explain'>("chat");
   const [fileName, setFileName] = useState<string>("");
   const [indexKey, setIndexKey] = useState<string>("");
   const [highlights, setHighlights] = useState<IHighlight[]>([]);
