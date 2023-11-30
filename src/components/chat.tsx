@@ -441,7 +441,10 @@ export const Chat = () => {
         <TextArea
           id="chat-box"
           className="mt-2"
-          style={{ backgroundColor: "rgba(var(--semi-grey-0), 1)" }}
+          style={{
+            backgroundColor: "rgba(var(--semi-grey-0), 1)",
+            borderColor: "rgba(var(--semi-grey-1), 1)",
+          }}
           value={userQuestion}
           rows={2}
           onChange={setUserQuestion}

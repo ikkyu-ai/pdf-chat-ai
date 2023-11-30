@@ -5,7 +5,7 @@
 }
 
 .semi-input-textarea-wrapper-focus {
-    border-color: black;
+    border-color: black !important;
 }
 
 .save-annotation:hover {
@@ -30,5 +30,5 @@
     }
   
 .slide-in {
-  animation: slideIn 250ms forwards;
+  animation: slideIn 450ms forwards;
 }

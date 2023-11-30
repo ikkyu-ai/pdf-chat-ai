@@ -9,6 +9,8 @@ import { useHover } from "ahooks";
 import { IHighlight, NewHighlight } from "./types/types";
 import { updateHash } from "./Sidebar";
 import { Spinner } from "./Spinner";
+import logo from "../assets/LOGO.png";
+import Image from "next/image";
 
 export type PdfContextProps = {
   showChat: boolean;
@@ -164,6 +166,12 @@ export default function Home() {
           backgroundColor: "black",
         }}
       >
+        <Image
+          src={logo}
+          alt="logo"
+          height={20}
+          style={{ position: "fixed", top: 14, left: 16 }}
+        />
         <div className="flex items-center px-20 py-2">
           {isAIBusy ? <Spinner /> : null}
           <div className="mr-3">{fileName}</div>
