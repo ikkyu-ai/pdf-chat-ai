@@ -460,7 +460,7 @@ export const Chat = () => {
             theme="solid"
             type="primary"
             onClick={() => {
-              sendQuestion(`${selectedText} ${userQuestion}`);
+              sendQuestion(`${userQuestion}`);
               setTimeout(() => {
                 setUserQuestion("");
               }, 50);
