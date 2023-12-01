@@ -154,6 +154,9 @@ export default function Home() {
     }
     setHighlights([newHighlight, ...highlights]);
     setNeedRefreshHighlights(true);
+    setTimeout(() => {
+      setHighlights(getHighlights());
+    }, 100);
   };
 
   return (

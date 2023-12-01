@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import type { IHighlight } from "react-pdf-highlighter";
-import { PdfContext } from "./page";
+import { PdfContext, getHighlights } from "./page";
 import { resetHash } from "./PdfDisplayer";
 import { FileStorage } from "@/components/chat";
 
@@ -52,12 +52,13 @@ export function Sidebar({
   }, [selectedFile]);
 
   useEffect(() => {
-    const temp =
-      (JSON.parse(localStorage.getItem("chatStorage") || "[]") as FileStorage[])
-        .find((i) => i.fileName === localStorage.getItem("fileName"))
-        ?.histories.map((h) => h.highlight) || [];
-    setHl(temp);
-  }, [retrieveTrigger, needRefreshHighlights]);
+    // const temp =
+    //   (JSON.parse(localStorage.getItem("chatStorage") || "[]") as FileStorage[])
+    //     .find((i) => i.fileName === localStorage.getItem("fileName"))
+    //     ?.histories.map((h) => h.highlight) || [];
+    // setHl(temp);
+    setHl(getHighlights());
+  }, [retrieveTrigger, needRefreshHighlights, highlights]);
 
   return (
     <div
